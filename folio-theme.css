@@ -1,0 +1,44 @@
+/* RUNE / FIELD FOLIO — standalone presentation layer, no state or auth changes */
+:root{--bg:#e7dfce;--surface:#f7f0df;--surface2:#eae0cd;--border:#c4ad8c;--text:#303a38;--muted:#70695d;--gold:#98703e;--green:#617362;--red:#96534b}
+body{background-color:#e7dfce;background-image:radial-gradient(circle at 8% 4%,#fff6e2 0,transparent 34%),repeating-linear-gradient(0deg,transparent 0 27px,#604c3510 28px),linear-gradient(95deg,#c9b38c14,transparent 28%,#967d5710 90%);color:var(--text)}
+.app-shell .sidebar{background:linear-gradient(170deg,#1a302f,#14282d 66%,#15232c);border-right:3px solid #a78a5c;box-shadow:8px 0 27px #40331e18}
+.app-shell .brand{color:#e9d4a8}
+.app-shell .brand>span>span,.app-shell .sidebar-label{color:#b6bcae}
+.app-shell .nav-item{border-radius:3px;color:#cfdbd0;transition:background .15s,border-color .15s}
+.app-shell .nav-item:hover{background:#e8d6aa12;border-color:#bca57b42}
+.app-shell .nav-item.active{background:linear-gradient(90deg,#aa865c2c,#d0ba8a0d);color:#f8eacc;border-color:#bfa8797d;box-shadow:inset 3px 0 0 #d8b982}
+.app-shell .main{background:transparent}
+.app-shell .topbar{background:#f0e8d9ee;border-bottom:1px solid #c0ad92}
+.app-shell .topbar>div,.app-shell .topbar-breadcrumb{color:#66695e}
+.app-shell .content{max-width:1510px}
+.app-shell .hero{border-radius:5px;border:1px solid #9b7850;box-shadow:0 12px 30px #5e462523,inset 0 0 0 5px #f2e8d163,inset 0 0 0 6px #a88d676b;min-height:275px;background:linear-gradient(108deg,#f6ecd7 0%,#e8d4ae 59%,#b8a184 100%)}
+.app-shell .hero:before{content:"";position:absolute;inset:14px;border:1px solid #a88b5c59;pointer-events:none;z-index:0}
+.app-shell .hero h1{color:#323e39;text-shadow:0 1px #fff2d6}
+.app-shell .hero h1 em{color:#845a36}
+.app-shell .hero .eyebrow,.app-shell .hero .hero-copy>p:last-of-type{color:#765d43}
+.app-shell .hero .mountains{opacity:.22;filter:sepia(.9) contrast(.88)}
+.app-shell .hero-seal,.app-shell .hero-seal .crest{color:#785c3b}
+.app-shell .hero-character{color:#34463c}
+.app-shell .hero-character small,.app-shell .hero-character>svg{color:#72624d}
+.app-shell .hero-character .avatar-mini{color:#e8d4a6;background:#324c42}
+.app-shell .eyebrow,.app-shell .section-caption{color:#815e3d}
+.app-shell .panel,.app-shell .spell-card,.app-shell .library-card{background:linear-gradient(132deg,#fcf7eb,#f0e5d2);border:1px solid #cbb697;border-radius:4px;box-shadow:0 4px 15px #55402112;position:relative}
+.app-shell .panel:before,.app-shell .spell-card:before{content:"";position:absolute;inset:5px;border:1px solid #b89e742b;pointer-events:none}
+.app-shell .panel-heading{border-bottom:1px solid #c9b697;padding-bottom:11px}
+.app-shell .panel-heading h2,.app-shell .spell-card h2,.app-shell .page-heading h1,.app-shell .empty h3{color:#3f4b42}
+.app-shell .panel-heading h2,.app-shell .page-heading h1,.app-shell .spell-card h2{font-family:Georgia,"Times New Roman",serif}
+.app-shell .page-heading h1{letter-spacing:.015em}
+.app-shell .hp-display>strong,.app-shell .combat-stats strong{color:#2f5148}
+.app-shell .hp-track{background:#d9c9ad}
+.app-shell .hp-track>span{background:linear-gradient(90deg,#668b77,#456b5f)}
+.app-shell .quick-notes textarea,.app-shell textarea,.app-shell input,.app-shell select{background:#fffaf0;color:#293b34;border-color:#c4ad8d;border-radius:3px}
+.app-shell .button,.app-shell .pip,.app-shell .stepper{border-radius:3px}
+.app-shell .dice-tray{background:linear-gradient(110deg,#263c40,#1a303c);border:1px solid #a28c68;box-shadow:inset 0 0 0 4px #ffffff0d}
+.app-shell .library-card{box-shadow:0 4px 0 #c2a67b,0 10px 24px #5742241b}
+.app-shell .readiness-panel{background:#f7eddb;border-radius:4px}
+.app-shell .setup-banner{background:#eee0c6;border:1px dashed #b99870;color:#4a5145}
+.app-shell .setup-banner strong,.app-shell .setup-banner span{color:#5c5849}
+.st-drawer{border-color:#ac9065!important}
+.st-drawer>summary{letter-spacing:.13em}
+@media(max-width:750px){.app-shell .sidebar{border-right-width:2px}.app-shell .hero{min-height:246px}.app-shell .panel{padding:15px}.app-shell .hero:before{inset:8px}}
+@media(prefers-reduced-motion:reduce){.app-shell .nav-item{transition:none}}
