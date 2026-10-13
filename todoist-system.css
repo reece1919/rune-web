@@ -40,3 +40,14 @@
 .st-drawer .system-todoist{--st-ink:#3b3026;--st-muted:#6f5d4a;--st-line:rgba(96,77,53,.22);
   margin:0;border:none;background:#ede0c4;border-radius:0}
 @media(max-width:650px){.system-todoist-list{grid-template-columns:1fr}.st-drawer{bottom:10px;right:10px;width:min(360px,calc(100vw - 20px))}}
+
+/* Inline MFA step for a fresh standalone ECHO or RUNE sign-in. */
+.st-verify-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:10px 0}
+.st-verify-form label{display:grid;gap:5px;font-size:11px;color:var(--st-muted)}
+.st-verify-form input,.st-verify-form select{
+ box-sizing:border-box;width:100%;min-width:0;padding:9px;border:1px solid var(--st-line);
+ background:var(--panel,var(--card,#263244));color:var(--st-ink);border-radius:7px;font:inherit
+}
+.st-verify-form button{grid-column:1/-1;padding:8px 10px;border:1px solid var(--st-line);border-radius:7px;
+ background:transparent;color:var(--st-ink);cursor:pointer}
+@media(max-width:420px){.st-verify-form{grid-template-columns:minmax(0,1fr)}}
