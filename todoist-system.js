@@ -7,7 +7,7 @@
  const BRIDGE=URL+"/functions/v1/orbit-todoist";
  const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
  const localDay=d=>[d.getFullYear(),String(d.getMonth()+1).padStart(2,"0"),String(d.getDate()).padStart(2,"0")].join("-");
- let db=null,busy=false,last=0,owner="",pending=null;
+ let db=null,busy=false,verifying=false,last=0,owner="",pending=null;
  function getDB(){
   if(window.ORBITAuth?.client)return window.ORBITAuth.client;
   if(window.GAIA_CLOUD?.client)return window.GAIA_CLOUD.client;
@@ -21,9 +21,39 @@
   const label=String(host.dataset.systemTodoist||"").trim().toUpperCase();
   host.innerHTML='<div class="system-todoist-head"><strong>TODOIST / '+esc(label)+'</strong><button type="button" data-st-refresh aria-label="Refresh '+esc(label)+' Todoist tasks">Refresh</button></div><div class="system-todoist-message" role="status">Checking tasks…</div><div class="system-todoist-list"></div><a class="system-todoist-link" href="https://app.todoist.com/app/today" target="_blank" rel="noopener noreferrer">Open Todoist ↗</a>';
   host.querySelector("[data-st-refresh]").addEventListener("click",()=>void refresh(true));
+  host.addEventListener("submit",async event=>{
+   const form=event.target.closest(".st-verify-form");if(!form)return;
+   event.preventDefault();if(verifying)return;
+   const factorId=form.querySelector("select").value;
+   const code=form.querySelector("input").value.trim();
+   if(!/^[0-9]{6}$/.test(code)){host.querySelector(".system-todoist-message").textContent="Enter a six-digit code.";return}
+   verifying=true;
+   host.querySelector(".system-todoist-message").textContent="Verifying…";
+   try{
+    const client=getDB();
+    if(!client)throw Error("Sign in again.");
+    const {error}=await client.auth.mfa.challengeAndVerify({factorId,code});
+    if(error)throw error;
+    last=0;
+    host.querySelector(".system-todoist-message").textContent="Verified.";
+    await refresh(true);
+   }catch(error){host.querySelector(".system-todoist-message").textContent=error.message||"Code not accepted."}
+   finally{verifying=false}
+  });
  }
  function note(text){
   for(const h of hosts){h.querySelector(".system-todoist-message").textContent=text;h.querySelector(".system-todoist-list").replaceChildren()}
+ }
+ async function offerVerification(client){
+  const {data,error}=await client.auth.mfa.listFactors();
+  if(error)throw error;
+  const factors=(data?.totp||[]).filter(f=>f.status==="verified");
+  if(!factors.length){note("Set up an authenticator in ORBIT Settings first.");return}
+  for(const host of hosts){
+   host.querySelector(".system-todoist-message").textContent="Verify your authenticator to load tasks.";
+   const options=factors.map(f=>'<option value="'+esc(f.id)+'">'+esc(f.friendly_name||"Authenticator")+'</option>').join("");
+   host.querySelector(".system-todoist-list").innerHTML='<form class="st-verify-form"><label>Authenticator<select required aria-label="Select authenticator">'+options+'</select></label><label>6-digit code<input type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" required></label><button type="submit">Verify</button></form>';
+  }
  }
  function section(name,list){
   if(!list.length)return "";
@@ -73,7 +103,7 @@
     const user=data.session.user.id;if(owner&&owner!==user)last=0;owner=user;
     const level=await client.auth.mfa.getAuthenticatorAssuranceLevel();
     if(level.error)throw level.error;
-    if(level.data?.currentLevel!=="aal2"){note("Verify your authenticator to load tasks.");return}
+    if(level.data?.currentLevel!=="aal2"){await offerVerification(client);return}
     const stat=await request("status",data.session);
     if(!stat.connected){note("Connect Todoist from ORBIT → Tasks.");return}
     let tasks=[],cursor="",partial=false;
