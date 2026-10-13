@@ -9,10 +9,10 @@
   "background_color": "#e7dfce",
   "icons": [
     {
-      "src": "/rune-web/favicon.svg?v=1.5.0",
+      "src": "/rune-web/favicon.svg?v=1.6.0",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ]
 }
