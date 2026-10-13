@@ -1,0 +1,18 @@
+{
+  "id": "/rune-web/",
+  "name": "RUNE — Adventure Companion",
+  "short_name": "RUNE",
+  "start_url": "/rune-web/",
+  "scope": "/rune-web/",
+  "display": "standalone",
+  "theme_color": "#152a43",
+  "background_color": "#152a43",
+  "icons": [
+    {
+      "src": "/rune-web/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
