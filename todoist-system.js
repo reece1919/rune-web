@@ -57,10 +57,13 @@
  }
  function section(name,list){
   if(!list.length)return "";
-  return '<div class="st-group"><h4>'+esc(name)+'</h4>'+list.slice(0,6).map(task=>{
+  // Render every matching task, including subtasks; never silently hide the seventh item.
+  return '<div class="st-group"><h4>'+esc(name)+'</h4>'+list.map(task=>{
     const id=encodeURIComponent(String(task.id||""));
-    return '<a class="st-task" href="https://app.todoist.com/app/task/'+id+'" target="_blank" rel="noopener noreferrer"><span>'+esc(task.content||"Untitled task")+'</span><span class="st-arrow" aria-hidden="true">↗</span></a>';
-  }).join("")+(list.length>6?'<small>+'+(list.length-6)+' more in Todoist</small>':"")+'</div>';
+    const nested=!!task.parent_id;
+    const marker=nested?'↳ ':'';
+    return '<a class="st-task" href="https://app.todoist.com/app/task/'+id+'" target="_blank" rel="noopener noreferrer"'+(nested?' style="padding-left:1.15rem"':'')+'><span>'+marker+esc(task.content||"Untitled task")+'</span><span class="st-arrow" aria-hidden="true">↗</span></a>';
+  }).join("")+'</div>';
  }
  function render(tasks){
   const today=new Date();const next=new Date(today);next.setDate(today.getDate()+1);
@@ -68,8 +71,12 @@
   const d0=localDay(today),d1=localDay(next),d7=localDay(future);
   for(const host of hosts){
    const name=String(host.dataset.systemTodoist||"").toLowerCase();
-   const own=tasks.filter(t=>Array.isArray(t.labels)&&t.labels.some(l=>String(l).replace(/^@/,"").trim().toLowerCase()===name));
-   const day=t=>String(t.due?.date||"").slice(0,10);
+   const byId=new Map(tasks.map(t=>[String(t.id),t]));
+   const labeled=t=>Array.isArray(t?.labels)&&t.labels.some(l=>String(l).replace(/^@/,"").trim().toLowerCase()===name);
+   // Todoist subtasks often have no labels: inherit dashboard membership from a labeled parent.
+   const ancestors=t=>{const result=[];const seen=new Set([String(t.id)]);let parent=t.parent_id;while(parent&&result.length<25&&!seen.has(String(parent))){seen.add(String(parent));const p=byId.get(String(parent));if(!p)break;result.push(p);parent=p.parent_id;}return result};
+   const own=tasks.filter(t=>labeled(t)||ancestors(t).some(labeled));
+   const day=t=>String(t.due?.date||ancestors(t).find(p=>p.due?.date)?.due?.date||"").slice(0,10);
    const ordered=[...own].sort((a,b)=>(day(a)||"9999").localeCompare(day(b)||"9999")||Number(b.priority||0)-Number(a.priority||0));
    const html=section("Overdue",ordered.filter(t=>day(t)&&day(t)<d0))+
      section("Today",ordered.filter(t=>day(t)===d0))+
