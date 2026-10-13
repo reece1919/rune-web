@@ -1,0 +1,42 @@
+/* Shared read-only Todoist system lists; respects each dashboard's existing theme. */
+.system-todoist{
+ --st-line:var(--line,rgba(149,159,175,.24));
+ --st-ink:var(--text,inherit);
+ --st-muted:var(--muted,#949ba4);
+ color:var(--st-ink);
+ background:var(--card,var(--panel,rgba(16,24,36,.72)));
+ border:1px solid var(--st-line);border-radius:13px;
+ padding:15px 16px;margin:12px 0;min-width:0
+}
+.system-todoist *{box-sizing:border-box}
+.system-todoist-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-bottom:7px}
+.system-todoist-head strong{font-size:12px;font-weight:750;letter-spacing:.08em;color:var(--st-ink)}
+.system-todoist-head button{
+ background:transparent;border:1px solid var(--st-line);color:var(--st-muted);
+ border-radius:8px;font-size:11px;padding:6px 10px;cursor:pointer
+}
+.system-todoist-message{font-size:11px;color:var(--st-muted);margin:4px 0;line-height:1.5}
+.system-todoist-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:10px 16px}
+.st-group{min-width:0}
+.st-group h4{font-size:11px;margin:11px 0 7px;color:var(--st-muted);font-weight:750;letter-spacing:.04em}
+.st-task{
+ display:flex;justify-content:space-between;align-items:center;gap:9px;
+ min-height:34px;padding:7px 0;border-bottom:1px solid var(--st-line);
+ color:var(--st-ink);font-size:12px;line-height:1.45;text-decoration:none
+}
+.st-task:hover{text-decoration:underline}
+.st-arrow{color:var(--st-muted);flex:none}
+.st-group small{display:block;color:var(--st-muted);font-size:10px;margin:7px 0}
+.system-todoist-link{display:inline-block;font-size:11px;color:var(--st-muted);margin-top:11px}
+.system-todoist-link:hover{color:var(--st-ink)}
+.system-todoist-container{border:1px solid var(--line,#d8ded7);border-radius:12px;margin:12px 0;background:var(--card,#fff)}
+.system-todoist-container>summary{cursor:pointer;padding:12px 15px;font-size:12px;font-weight:750}
+.system-todoist-container .system-todoist{margin:0;border:none;background:transparent;padding-top:5px}
+.st-drawer{position:fixed;right:14px;bottom:14px;z-index:70;width:min(390px,calc(100vw - 28px));
+ max-height:75vh;overflow:auto;border:1px solid #9f8b70;background:#dfcaa5;color:#3d3025;
+ box-shadow:0 12px 37px rgba(23,17,14,.3);border-radius:13px}
+.st-drawer>summary{cursor:pointer;list-style:none;padding:12px 15px;font-size:12px;letter-spacing:.08em;font-weight:800}
+.st-drawer>summary::before{content:"✧";margin-right:9px}
+.st-drawer .system-todoist{--st-ink:#3b3026;--st-muted:#6f5d4a;--st-line:rgba(96,77,53,.22);
+  margin:0;border:none;background:#ede0c4;border-radius:0}
+@media(max-width:650px){.system-todoist-list{grid-template-columns:1fr}.st-drawer{bottom:10px;right:10px;width:min(360px,calc(100vw - 20px))}}
