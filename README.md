@@ -1,5 +1,11 @@
 # RUNE — public website
 
+## Todoist / RUNE quests (October 2026)
+
+The published standalone website has a collapsible parchment-style Todoist drawer, showing open tasks labeled `rune`. It uses ORBIT's OAuth bridge and the shared MFA session; it never accesses or alters RUNE character records. The public website favicon now uses RUNE's parchment seal emblem.
+
+**Publishing caveat:** This repository contains compiled output from the private `reece1919/rune` source. Changes to the task drawer and favicon must be ported into the private standalone build process before the next full rebuild, or a later build may overwrite the public-only additions. The original ChatGPT Sites deployment and character saves are unchanged.
+
 This repository contains **only the compiled, sanitized website** for RUNE, the multi-character tabletop RPG dashboard.
 
 **Private application source:** [reece1919/rune](https://github.com/reece1919/rune) (access restricted)
