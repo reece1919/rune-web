@@ -5,11 +5,11 @@
   "start_url": "/rune-web/",
   "scope": "/rune-web/",
   "display": "standalone",
-  "theme_color": "#152a43",
-  "background_color": "#152a43",
+  "theme_color": "#e7dfce",
+  "background_color": "#e7dfce",
   "icons": [
     {
-      "src": "/rune-web/favicon.svg",
+      "src": "/rune-web/favicon.svg?v=1.5.0",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
