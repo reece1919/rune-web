@@ -55,14 +55,64 @@
    host.querySelector(".system-todoist-list").innerHTML='<form class="st-verify-form"><label>Authenticator<select required aria-label="Select authenticator">'+options+'</select></label><label>6-digit code<input type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" required></label><button type="submit">Verify</button></form>';
   }
  }
+ function hierarchy(records,dayOf,today) {
+ const source=Array.isArray(records)?records:[];
+ const index=new Map(source.map((t,i)=>[String(t.id),i]));
+ const nodes=new Map(source.map(t=>[String(t.id),{task:t,children:[]}]));
+ const roots=[];
+ const compareSibling=(a,b)=>{
+  const sameScope=String(a.project_id||"")===String(b.project_id||"")&&String(a.section_id||"")===String(b.section_id||"")&&String(a.parent_id||"")===String(b.parent_id||"");
+  if(sameScope){
+   if(typeof a.order_key==="string"&&a.order_key&&typeof b.order_key==="string"&&b.order_key&&a.order_key!==b.order_key)return a.order_key<b.order_key?-1:1;
+   const ao=a.child_order,bo=b.child_order;
+   if(Number.isFinite(ao)&&Number.isFinite(bo)&&ao!==bo)return ao-bo;
+  }
+  return (index.get(String(a.id))??0)-(index.get(String(b.id))??0);
+ };
+ for(const node of nodes.values()){
+  const t=node.task,parent=nodes.get(String(t.parent_id));
+  let safe=!!parent&&parent!==node;
+  if(safe){
+   const seen=new Set([String(t.id)]);let p=String(t.parent_id);
+   while(nodes.has(p)){
+    if(seen.has(p)){safe=false;break}
+    seen.add(p);p=String(nodes.get(p).task.parent_id);
+   }
+  }
+  if(safe)parent.children.push(node);
+  else roots.push(node);
+ }
+ const sortChildren=node=>{node.children.sort((a,b)=>compareSibling(a.task,b.task));node.children.forEach(sortChildren)};
+ roots.forEach(sortChildren);
+ const groupDate=node=>{
+  const direct=dayOf(node.task);
+  if(direct)return direct;
+  const dates=node.children.map(groupDate).filter(Boolean);
+  return dates.length?dates.sort()[0]:"";
+ };
+ roots.sort((a,b)=>{
+  const da=groupDate(a)||"9999-12-31",db=groupDate(b)||"9999-12-31";
+  if(da!==db)return da.localeCompare(db);
+  if(da===today&&Number.isFinite(a.task.day_order)&&Number.isFinite(b.task.day_order)&&a.task.day_order!==b.task.day_order)return a.task.day_order-b.task.day_order;
+  return compareSibling(a.task,b.task);
+ });
+ const out=[];
+ const visit=(node,depth,date)=>{
+  out.push({...node.task,_treeDepth:depth,_groupDay:date});
+  for(const child of node.children)visit(child,depth+1,date);
+ };
+ for(const root of roots)visit(root,0,groupDate(root));
+ return out;
+}
  function section(name,list){
   if(!list.length)return "";
-  // Render every matching task, including subtasks; never silently hide the seventh item.
+  // Keep Todoist's manual subtask order and visually preserve nested parent/child hierarchy.
   return '<div class="st-group"><h4>'+esc(name)+'</h4>'+list.map(task=>{
     const id=encodeURIComponent(String(task.id||""));
-    const nested=!!task.parent_id;
+    const depth=Math.min(Number(task._treeDepth||0),5);
+    const nested=depth>0;
     const marker=nested?'↳ ':'';
-    return '<a class="st-task" href="https://app.todoist.com/app/task/'+id+'" target="_blank" rel="noopener noreferrer"'+(nested?' style="padding-left:1.15rem"':'')+'><span>'+marker+esc(task.content||"Untitled task")+'</span><span class="st-arrow" aria-hidden="true">↗</span></a>';
+    return '<a class="st-task" href="https://app.todoist.com/app/task/'+id+'" target="_blank" rel="noopener noreferrer"'+(nested?' style="padding-left:'+(0.5+depth*0.9)+'rem"':'')+'><span>'+marker+esc(task.content||"Untitled task")+'</span><span class="st-arrow" aria-hidden="true">↗</span></a>';
   }).join("")+'</div>';
  }
  function render(tasks){
@@ -73,16 +123,18 @@
    const name=String(host.dataset.systemTodoist||"").toLowerCase();
    const byId=new Map(tasks.map(t=>[String(t.id),t]));
    const labeled=t=>Array.isArray(t?.labels)&&t.labels.some(l=>String(l).replace(/^@/,"").trim().toLowerCase()===name);
-   // Todoist subtasks often have no labels: inherit dashboard membership from a labeled parent.
+   // Unlabeled subtasks inherit their system membership from a labeled ancestor.
    const ancestors=t=>{const result=[];const seen=new Set([String(t.id)]);let parent=t.parent_id;while(parent&&result.length<25&&!seen.has(String(parent))){seen.add(String(parent));const p=byId.get(String(parent));if(!p)break;result.push(p);parent=p.parent_id;}return result};
    const own=tasks.filter(t=>labeled(t)||ancestors(t).some(labeled));
    const day=t=>String(t.due?.date||ancestors(t).find(p=>p.due?.date)?.due?.date||"").slice(0,10);
-   const ordered=[...own].sort((a,b)=>(day(a)||"9999").localeCompare(day(b)||"9999")||Number(b.priority||0)-Number(a.priority||0));
-   const html=section("Overdue",ordered.filter(t=>day(t)&&day(t)<d0))+
-     section("Today",ordered.filter(t=>day(t)===d0))+
-     section("Tomorrow",ordered.filter(t=>day(t)===d1))+
-     section("Upcoming",ordered.filter(t=>day(t)>d1&&day(t)<=d7))+
-     section("Unscheduled",ordered.filter(t=>!day(t)));
+   const ordered=hierarchy(own,day,d0);
+   // Sections are assigned to the visible parent so children never get detached by their own dates.
+   const group=t=>t._groupDay||"";
+   const html=section("Overdue",ordered.filter(t=>group(t)&&group(t)<d0))+
+     section("Today",ordered.filter(t=>group(t)===d0))+
+     section("Tomorrow",ordered.filter(t=>group(t)===d1))+
+     section("Upcoming",ordered.filter(t=>group(t)>d1&&group(t)<=d7))+
+     section("Unscheduled",ordered.filter(t=>!group(t)));
    host.querySelector(".system-todoist-message").textContent=own.length?"":"No tasks labeled @"+name;
    host.querySelector(".system-todoist-list").innerHTML=html;
   }
