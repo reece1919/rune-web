@@ -90,7 +90,17 @@
   const dates=node.children.map(groupDate).filter(Boolean);
   return dates.length?dates.sort()[0]:"";
  };
+ // Morning and evening checklists are fixed anchors in displayed views.
+ // Only root tasks are promoted; all their subtasks retain the saved sibling order.
+ const daypartRank=task=>{
+  const title=String(task?.content||"").toLowerCase().trim().replace(/\s+/g," ");
+  if(/^morning (?:routine|check ?list)\b/.test(title))return -1;
+  if(/^evening (?:routine|check ?list)\b/.test(title))return 1;
+  return 0;
+ };
  roots.sort((a,b)=>{
+  const rankA=daypartRank(a.task),rankB=daypartRank(b.task);
+  if(rankA!==rankB)return rankA-rankB;
   const da=groupDate(a)||"9999-12-31",db=groupDate(b)||"9999-12-31";
   if(da!==db)return da.localeCompare(db);
   if(da===today&&Number.isFinite(a.task.day_order)&&Number.isFinite(b.task.day_order)&&a.task.day_order!==b.task.day_order)return a.task.day_order-b.task.day_order;
