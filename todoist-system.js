@@ -164,7 +164,11 @@
     if(level.error)throw level.error;
     if(level.data?.currentLevel!=="aal2"){await offerVerification(client);return}
     const stat=await request("status",data.session);
-    if(!stat.connected){note("Connect Todoist from ORBIT → Tasks.");return}
+    if(!stat.connected){
+      note(stat.reconnect_required?"Todoist authorization expired. Reconnect in ORBIT → Tasks.":"Connect Todoist from ORBIT → Tasks.");
+      if(stat.reconnect_required)for(const host of hosts)host.querySelector(".system-todoist-list").innerHTML='<a class="system-todoist-link" href="https://reece1919.github.io/orbit/">Open ORBIT to reconnect ↗</a>';
+      return
+    }
     let tasks=[],cursor="",partial=false;
     for(let i=0;i<10;i++){
      const params=new URLSearchParams({limit:"200"});if(cursor)params.set("cursor",cursor);
