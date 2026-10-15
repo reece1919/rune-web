@@ -43,8 +43,8 @@ body{background-color:#e7dfce;background-image:radial-gradient(circle at 8% 4%,#
 @media(max-width:750px){.app-shell .sidebar{border-right-width:2px}.app-shell .hero{min-height:246px}.app-shell .panel{padding:15px}.app-shell .hero:before{inset:8px}}
 @media(prefers-reduced-motion:reduce){.app-shell .nav-item{transition:none}}
 
-/* Official RUNE shield: display the favicon art behind existing inline crests.
+/* Official RUNE Runic R: display the approved transparent emblem behind existing inline crests.
    The shipped React bundle renders inline SVG crests; suppress only their decorative
    strokes so they match the icon. Retain their sizing and React-owned DOM. */
-svg.crest{background-image:url('/rune-web/favicon.svg?v=1.6.0');background-size:contain;background-position:center;background-repeat:no-repeat}
+svg.crest{background-image:url('/rune-web/rune-emblem.png?v=2.0.0');background-size:contain;background-position:center;background-repeat:no-repeat}
 svg.crest>*{opacity:0}

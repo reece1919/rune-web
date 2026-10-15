@@ -9,9 +9,9 @@
   "background_color": "#e7dfce",
   "icons": [
     {
-      "src": "/rune-web/favicon.svg?v=1.6.0",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "/rune-web/rune-emblem.png?v=2.0.0",
+      "sizes": "128x128",
+      "type": "image/png",
       "purpose": "any"
     }
   ]
